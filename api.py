@@ -6,6 +6,7 @@ from celery_worker import create_order
 from model import Order
 from celery.result import AsyncResult
 
+
 app = FastAPI()
 
 
@@ -40,14 +41,18 @@ async def send_notification(email: str, background_tasks: BackgroundTasks):
     background_tasks.add_task(write_notification, email, message="some notification")
     return {"message": "Notification sent in the background"}
 
-@app.post("/order")
-async def add_order(order: Order):
+@app.post("/NewTask")
+async def NewTask(order: Order):
     task = create_order.delay(order.customer_name, order.order_quantity)
     return {f"Order{task.task_id} rcved"}
 
-@app.get("/orderresult")
-async def add_order(taskid):
+@app.get("/TaskResult")
+async def get_order(taskid):
     res = AsyncResult(taskid)
     res.ready()
     print(res.result)
     return "ok"
+
+@app.post("/CancelTask")
+async def cancel_order(taskid):
+    AsyncResult(taskid).revoke(terminate=True)

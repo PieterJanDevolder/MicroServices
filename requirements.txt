@@ -4,4 +4,4 @@ uvicorn[standard]
 celery
 redis
 flower
-gevent
+eventlet
